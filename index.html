@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanzim Ahmed — whoami</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg: #060a17;
+    --bg-raise: #0d1428;
+    --panel: #101a34;
+    --line: #1e2a4d;
+    --blue: #3d7dfa;
+    --cyan: #4fd8ff;
+    --text: #dfe7f7;
+    --text-dim: #8593b8;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --display: 'Sora', sans-serif;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(61,125,250,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(61,125,250,0.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    pointer-events:none;
+    z-index:0;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+
+  a{ color:inherit; }
+
+  ::selection{ background:var(--blue); color:#fff; }
+
+  :focus-visible{
+    outline:2px solid var(--cyan);
+    outline-offset:3px;
+  }
+
+  .wrap{
+    max-width: 760px;
+    margin:0 auto;
+    padding: 0 24px;
+    position:relative;
+    z-index:1;
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background: rgba(6,10,23,0.75);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height:60px;
+  }
+  .logo{
+    font-family:var(--mono);
+    font-size:0.95rem;
+    color:var(--cyan);
+    letter-spacing:0.02em;
+  }
+  .logo span{ color:var(--text-dim); }
+  .navlinks{ display:flex; gap:24px; font-family:var(--mono); font-size:0.85rem; }
+  .navlinks a{
+    color:var(--text-dim);
+    text-decoration:none;
+    transition:color .2s ease;
+    padding:4px 2px;
+    border-bottom:1px solid transparent;
+  }
+  .navlinks a:hover{ color:var(--cyan); border-color:var(--cyan); }
+
+  @media (max-width:560px){
+    .navlinks{ gap:14px; font-size:0.75rem; }
+  }
+
+  /* ---------- HERO / TERMINAL ---------- */
+  header.hero{
+    padding: 72px 0 60px;
+  }
+
+  .terminal{
+    background: var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow: 0 30px 80px -30px rgba(61,125,250,0.35), 0 0 0 1px rgba(61,125,250,0.05);
+  }
+  .term-bar{
+    display:flex; align-items:center; gap:8px;
+    padding:12px 16px;
+    background: var(--bg-raise);
+    border-bottom:1px solid var(--line);
+  }
+  .dot{ width:11px; height:11px; border-radius:50%; }
+  .dot.r{ background:#ff5f57; }
+  .dot.y{ background:#febc2e; }
+  .dot.g{ background:#28c840; }
+  .term-title{
+    margin-left:auto;
+    font-family:var(--mono);
+    font-size:0.75rem;
+    color:var(--text-dim);
+  }
+  .term-body{
+    padding: 24px 22px 30px;
+    font-family:var(--mono);
+    font-size:0.92rem;
+  }
+  .term-line{ display:flex; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
+  .prompt{ color: var(--cyan); flex-shrink:0; }
+  .cmd{ color: var(--text); }
+  .output{
+    color: var(--text-dim);
+    margin: 4px 0 18px 0;
+    padding-left:20px;
+    border-left:2px solid var(--line);
+  }
+  .output strong{ color:var(--text); font-weight:600; }
+  .output .role{ color:var(--cyan); }
+  .cursor{
+    display:inline-block;
+    width:8px; height:1.1em;
+    background:var(--cyan);
+    vertical-align:text-bottom;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .hero-tagline{
+    margin-top:26px;
+    font-family:var(--display);
+    font-weight:700;
+    font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+    line-height:1.25;
+    max-width:15ch;
+  }
+  .hero-tagline .accent{ color:var(--cyan); }
+
+  /* ---------- SECTION SHARED ---------- */
+  section{ padding: 56px 0; border-top:1px solid var(--line); }
+  section h2{
+    font-family:var(--mono);
+    font-size:0.85rem;
+    color:var(--text-dim);
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:30px;
+  }
+  section h2::before{
+    content:"//";
+    color:var(--blue);
+  }
+  section h2 .title-main{
+    color:var(--text);
+    font-family:var(--display);
+    font-size:1.4rem;
+    font-weight:600;
+  }
+
+  /* ---------- TIMELINE (education = real sequence) ---------- */
+  .timeline{
+    position:relative;
+    padding-left: 28px;
+  }
+  .timeline::before{
+    content:"";
+    position:absolute; left:5px; top:6px; bottom:6px;
+    width:2px;
+    background: linear-gradient(var(--blue), var(--line));
+  }
+  .tl-item{
+    position:relative;
+    padding-bottom: 30px;
+  }
+  .tl-item:last-child{ padding-bottom:0; }
+  .tl-item::before{
+    content:"";
+    position:absolute; left:-28px; top:4px;
+    width:12px; height:12px;
+    border-radius:50%;
+    background: var(--bg);
+    border:2px solid var(--blue);
+  }
+  .tl-item.current::before{
+    background: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 4px rgba(79,216,255,0.15);
+  }
+  .tl-year{
+    font-family:var(--mono);
+    color:var(--cyan);
+    font-size:0.8rem;
+  }
+  .tl-title{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:1.05rem;
+    margin:4px 0 3px;
+  }
+  .tl-sub{ color:var(--text-dim); font-size:0.92rem; }
+
+  /* ---------- STORY / WHY SEU ---------- */
+  .story p{
+    color:var(--text-dim);
+    margin-bottom:16px;
+    max-width: 68ch;
+  }
+  .story strong{ color:var(--text); font-weight:600; }
+  .story .highlight{
+    background: var(--panel);
+    border-left:3px solid var(--cyan);
+    padding: 16px 18px;
+    border-radius: 0 8px 8px 0;
+    color:var(--text);
+    font-size:0.95rem;
+    margin: 20px 0;
+  }
+
+  /* ---------- GOALS ---------- */
+  .goal-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:600px){
+    .goal-grid{ grid-template-columns:1fr; }
+  }
+  .goal-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:20px;
+    transition: border-color .25s ease, transform .25s ease;
+  }
+  .goal-card:hover{
+    border-color: var(--blue);
+    transform: translateY(-3px);
+  }
+  .goal-label{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    color:var(--text-dim);
+    margin-bottom:8px;
+  }
+  .goal-card p{ font-size:0.95rem; color:var(--text); }
+
+  /* ---------- HOBBY ---------- */
+  .hobby-box{
+    display:flex; gap:18px; align-items:flex-start;
+    background: var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px;
+  }
+  .hobby-icon{
+    flex-shrink:0;
+    width:44px; height:44px;
+    border-radius:8px;
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hobby-icon svg{ width:22px; height:22px; stroke:#04101f; }
+  .hobby-box p{ color:var(--text-dim); font-size:0.95rem; }
+  .hobby-box strong{ color:var(--text); }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    padding: 40px 0 60px;
+    border-top:1px solid var(--line);
+    text-align:center;
+  }
+  footer .foot-line{
+    font-family:var(--mono);
+    font-size:0.8rem;
+    color:var(--text-dim);
+  }
+  footer .foot-line .prompt{ color:var(--cyan); }
+
+  /* ---------- scroll reveal ---------- */
+  .reveal{
+    opacity:0;
+    transform: translateY(16px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .reveal.in{
+    opacity:1;
+    transform:none;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
+    .reveal{ opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">tanzim<span>@</span>seu<span>:~$</span></div>
+    <div class="navlinks">
+      <a href="#education">education</a>
+      <a href="#journey">journey</a>
+      <a href="#goals">goals</a>
+      <a href="#hobby">hobby</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="terminal">
+      <div class="term-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="term-title">tanzim@southeast-university — bash</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line">
+          <span class="prompt">$</span>
+          <span class="cmd" id="typed-cmd"></span><span class="cursor" id="type-cursor"></span>
+        </div>
+        <div class="output" id="term-output" style="display:none;">
+          <div><strong>Tanzim Ahmed</strong> — <span class="role">CSE undergraduate, Southeast University</span></div>
+          <div>education: SSC (2023) &rarr; HSC (2025) &rarr; CSE @ Southeast University</div>
+          <div>status: building toward software engineering</div>
+          <div>interests: pulling things apart to see how they work</div>
+        </div>
+      </div>
+    </div>
+
+    <h1 class="hero-tagline reveal">Curious about how software gets built — <span class="accent">so I'm learning to build it.</span></h1>
+  </div>
+</header>
+
+<section id="education">
+  <div class="wrap">
+    <h2><span class="title-main">Education</span></h2>
+    <div class="timeline">
+      <div class="tl-item reveal">
+        <div class="tl-year">2023</div>
+        <div class="tl-title">SSC — Adamjee Cantonment Public School</div>
+        <div class="tl-sub">Where the basics were laid down.</div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-year">2025</div>
+        <div class="tl-title">HSC — Government Science College</div>
+        <div class="tl-sub">Science background, and the point where computing started pulling focus.</div>
+      </div>
+      <div class="tl-item current reveal">
+        <div class="tl-year">Ongoing</div>
+        <div class="tl-title">B.Sc. in Computer Science &amp; Engineering — Southeast University</div>
+        <div class="tl-sub">Currently studying here, by choice.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="journey">
+  <div class="wrap">
+    <h2><span class="title-main">Why Southeast University</span></h2>
+    <div class="story">
+      <p class="reveal">After HSC, I had admission offers from <strong>Rajshahi University</strong>, <strong>RUET</strong>, and <strong>AUST</strong> — all well-regarded options. I chose Southeast University instead, specifically for its <strong>CSE program</strong>.</p>
+      <div class="highlight reveal">To be direct about it: if I'd gotten into a top-tier university <em>for CSE</em>, I would have gone there. The subject mattered more to me than the name on the building.</div>
+      <p class="reveal">That's the whole logic behind the decision — pick the program that fits the goal, not just the most recognizable name.</p>
+    </div>
+  </div>
+</section>
+
+<section id="goals">
+  <div class="wrap">
+    <h2><span class="title-main">Where this is going</span></h2>
+    <div class="goal-grid">
+      <div class="goal-card reveal">
+        <div class="goal-label">right now</div>
+        <p>Working toward becoming a <strong style="color:var(--text)">software engineer</strong> — writing code that actually solves problems.</p>
+      </div>
+      <div class="goal-card reveal">
+        <div class="goal-label">long term</div>
+        <p>Growing into a <strong style="color:var(--text)">software developer and computer engineer</strong>, across both the software and hardware sides of computing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="hobby">
+  <div class="wrap">
+    <h2><span class="title-main">Outside the coursework</span></h2>
+    <div class="hobby-box reveal">
+      <div class="hobby-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 1v6m0 10v6M4.2 4.2l4.2 4.2m7.2 7.2l4.2 4.2M1 12h6m10 0h6M4.2 19.8l4.2-4.2m7.2-7.2l4.2-4.2"></path>
+        </svg>
+      </div>
+      <p><strong>Exploring new things and figuring out how they work</strong> — that curiosity is what pointed me toward computer science in the first place, and it's still what keeps the interest going.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-line"><span class="prompt">$</span> echo "thanks for stopping by"</div>
+  </div>
+</footer>
+
+<script>
+  // Typing animation for the terminal hero
+  (function(){
+    const text = "whoami --verbose";
+    const el = document.getElementById('typed-cmd');
+    const cursor = document.getElementById('type-cursor');
+    const output = document.getElementById('term-output');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if(reduced){
+      el.textContent = text;
+      output.style.display = 'block';
+      return;
+    }
+
+    let i = 0;
+    function type(){
+      if(i <= text.length){
+        el.textContent = text.slice(0, i);
+        i++;
+        setTimeout(type, 65);
+      } else {
+        setTimeout(() => {
+          cursor.style.display = 'none';
+          output.style.display = 'block';
+        }, 300);
+      }
+    }
+    setTimeout(type, 400);
+  })();
+
+  // Scroll reveal
+  (function(){
+    const items = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    items.forEach(item => io.observe(item));
+  })();
+</script>
+
+</body>
+</html>
