@@ -72,16 +72,22 @@
             transform: translateY(0);
         }
 
-        /* 3D Dynamic Wireframe Cube */
+        /* 3D Dynamic Wireframe Cube Wrapper */
         .cube-wrapper {
             perspective: 800px;
+            user-select: none;
+            touch-action: none;
         }
         .cube {
             width: 130px;
             height: 130px;
             position: relative;
             transform-style: preserve-3d;
-            animation: rotateCube 14s infinite linear;
+            cursor: grab;
+            will-change: transform;
+        }
+        .cube:active {
+            cursor: grabbing;
         }
         .cube-face {
             position: absolute;
@@ -94,6 +100,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            pointer-events: none;
         }
         .face-front  { transform: rotateY(0deg) translateZ(65deg); }
         .face-back   { transform: rotateY(180deg) translateZ(65deg); }
@@ -101,11 +108,6 @@
         .face-left   { transform: rotateY(-90deg) translateZ(65deg); }
         .face-top    { transform: rotateX(90deg) translateZ(65deg); }
         .face-bottom { transform: rotateX(-90deg) translateZ(65deg); }
-
-        @keyframes rotateCube {
-            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
-            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
-        }
 
         /* Glowing Text FX */
         .text-glow-blue {
@@ -156,7 +158,6 @@
     <nav class="fixed top-0 w-full z-40 backdrop-blur-xl bg-[#030712]/80 border-b border-slate-800/80">
         <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="#hero" class="flex items-center gap-3 group">
-                <!-- UPDATED: TA Logo explicitly set to white -->
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-sky-300 p-[2px] shadow-lg shadow-cyan-950/60 group-hover:scale-105 transition-transform">
                     <div class="w-full h-full bg-[#030712] rounded-[10px] flex items-center justify-center font-black text-white text-base font-display">
                         TA
@@ -221,10 +222,10 @@
                 </a>
             </div>
 
-            <!-- Animated 3D Wireframe Cube Display -->
+            <!-- Physics Interactive 3D Wireframe Cube Display -->
             <div class="reveal mt-16 flex justify-center items-center">
                 <div class="cube-wrapper">
-                    <div class="cube">
+                    <div class="cube" id="physics-cube">
                         <div class="cube-face face-front"><i data-lucide="code" class="w-9 h-9 text-cyan-400"></i></div>
                         <div class="cube-face face-back"><i data-lucide="box" class="w-9 h-9 text-blue-400"></i></div>
                         <div class="cube-face face-right"><i data-lucide="cpu" class="w-9 h-9 text-sky-400"></i></div>
@@ -573,7 +574,7 @@
                         </h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <!-- User's GitHub Profile Link -->
-                            <a href="https://https://github.com/tanzim-73" target="_blank" rel="noreferrer" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-cyan-400 hover:bg-slate-900 transition-all flex flex-col gap-2 group">
+                            <a href="https://tanzim-73.github.io" target="_blank" rel="noreferrer" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-cyan-400 hover:bg-slate-900 transition-all flex flex-col gap-2 group">
                                 <i data-lucide="github" class="w-6 h-6 text-cyan-400 group-hover:scale-110 transition-transform"></i>
                                 <span class="text-sm font-semibold text-slate-200">GitHub</span>
                                 <span class="text-xs text-slate-400 flex items-center gap-1 font-mono">
@@ -630,7 +631,7 @@
         });
 
         // Hover expand trigger for links & interactive elements
-        const interactiveElements = document.querySelectorAll("a, button, .tilt-card");
+        const interactiveElements = document.querySelectorAll("a, button, .tilt-card, .cube");
         interactiveElements.forEach((el) => {
             el.addEventListener("mouseenter", () => document.body.classList.add("hovering"));
             el.addEventListener("mouseleave", () => document.body.classList.remove("hovering"));
@@ -681,7 +682,6 @@
                 p.update();
                 p.draw();
 
-                // Draw connecting lines between close particles
                 for (let j = idx + 1; j < particles.length; j++) {
                     const p2 = particles[j];
                     const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
@@ -699,7 +699,7 @@
         }
         animateParticles();
 
-        // 3. Dynamic ScrollSpy Navigation Indicator (Marks Active Viewing Section)
+        // 3. Dynamic ScrollSpy Navigation Indicator
         const sections = document.querySelectorAll("section");
         const navLinks = document.querySelectorAll(".nav-link");
         const currentViewText = document.getElementById("current-view-text");
@@ -723,7 +723,6 @@
                 }
             });
 
-            // Update top text badge
             if (currentViewText) {
                 const capitalizedName = currentSectionId.charAt(0).toUpperCase() + currentSectionId.slice(1);
                 currentViewText.textContent = capitalizedName;
@@ -774,6 +773,89 @@
                 card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
             });
         });
+
+        // 7. Interactive 3D Physics Engine for the Cube
+        const cube = document.getElementById("physics-cube");
+
+        let isDragging = false;
+        let previousMouseX = 0;
+        let previousMouseY = 0;
+
+        let rotX = 0;
+        let rotY = 0;
+        let rotZ = 0;
+
+        let velX = 0;
+        let velY = 0;
+
+        // Constant baseline idle spin speeds
+        const baseSpeedX = 0.35;
+        const baseSpeedY = 0.5;
+        const baseSpeedZ = 0.2;
+
+        const friction = 0.94; // Velocity dampening factor
+        const returnEase = 0.05; // Ease factor back to natural state
+
+        function getPoint(e) {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function startInteraction(e) {
+            isDragging = true;
+            const pt = getPoint(e);
+            previousMouseX = pt.x;
+            previousMouseY = pt.y;
+            velX = 0;
+            velY = 0;
+        }
+
+        function moveInteraction(e) {
+            if (!isDragging) return;
+            const pt = getPoint(e);
+            const deltaX = pt.x - previousMouseX;
+            const deltaY = pt.y - previousMouseY;
+
+            velY = deltaX * 0.4;
+            velX = -deltaY * 0.4;
+
+            rotY += velY;
+            rotX += velX;
+
+            previousMouseX = pt.x;
+            previousMouseY = pt.y;
+        }
+
+        function endInteraction() {
+            isDragging = false;
+        }
+
+        cube.addEventListener("mousedown", startInteraction);
+        window.addEventListener("mousemove", moveInteraction);
+        window.addEventListener("mouseup", endInteraction);
+
+        cube.addEventListener("touchstart", startInteraction, { passive: true });
+        window.addEventListener("touchmove", moveInteraction, { passive: true });
+        window.addEventListener("touchend", endInteraction);
+
+        function updateCubePhysics() {
+            if (!isDragging) {
+                // Apply physics velocity deceleration & blend smoothly back to base rotation speed
+                velX *= friction;
+                velY *= friction;
+
+                rotX += velX + (baseSpeedX * (1 - Math.min(1, Math.abs(velX))));
+                rotY += velY + (baseSpeedY * (1 - Math.min(1, Math.abs(velY))));
+                rotZ += baseSpeedZ;
+            }
+
+            cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg)`;
+            requestAnimationFrame(updateCubePhysics);
+        }
+
+        updateCubePhysics();
     </script>
 </body>
 </html>
